@@ -9,4 +9,4 @@
 
 ## Initial Concept Design:
 
-<img src="src/img/concept_PageDesign_v1.png" alt="Conversion Image" />
+<img src="src/img/concept_PageDesign_v1.jpg" alt="Conversion Image" />
