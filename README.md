@@ -1,4 +1,4 @@
-# Simple PDF to JPG or JPG to PDF Converter
+# Simple PDF to JPG / JPG to PDF Converter
 
 ## Access via:
 
