@@ -1,0 +1,156 @@
+/*
+	Created by Phuah Jin Wei
+	Version 1.03
+	2025/10/14
+*/
+
+const { jsPDF } = window.jspdf;
+const fileInput = document.getElementById('file-uploader');
+const errorMessage = document.getElementById('error-message');
+const radioButtons = document.querySelectorAll('input[name="conversion"]');
+const convertButton = document.getElementById('convert-btn');
+
+
+function updateAccept() {
+    const selected = document.querySelector('input[name="conversion"]:checked').value;
+    if (selected === 'pdf-to-jpg') {
+        fileInput.accept = '.pdf';
+    } else if (selected === 'jpg-to-pdf') {
+        fileInput.accept = '.jpg, .jpeg';
+    }
+}
+
+// Initialize accept attribute
+updateAccept();
+
+radioButtons.forEach(rb => {
+    rb.addEventListener('change', () => {
+        updateAccept();
+        errorMessage.textContent = '';
+        fileInput.value = '';
+    });
+});
+
+// Handle the Convert button click
+convertButton.addEventListener('click', () => {
+    errorMessage.textContent = '';
+    const file = fileInput.files[0];
+    if (!file) {
+        errorMessage.textContent = 'Please select a file.';
+        return;
+    }
+    const selected = document.querySelector('input[name="conversion"]:checked').value;
+    const extension = file.name.toLowerCase().split('.').pop();
+
+    if (selected === 'jpg-to-pdf') {
+        if (extension !== 'jpg' && extension !== 'jpeg') {
+            errorMessage.textContent = 'Please upload a .jpg or .jpeg file.';
+            return;
+        }
+        // JPG to PDF conversion
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imgData = e.target.result;
+            const pdf = new jsPDF();
+            const img = new Image();
+            img.src = imgData;
+            img.onload = function() {
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 297; // A4 height in mm
+                const imgHeight = (img.height * imgWidth) / img.width;
+                if (imgHeight > pageHeight) {
+                    // If image taller than page, split across multiple pages
+                    let remainingHeight = imgHeight;
+                    let positionY = 0;
+                    const scale = imgWidth / img.width;
+                    const canvas = document.createElement('canvas');
+
+                    while (remainingHeight > 0) {
+                        const cutHeight = Math.min(remainingHeight, pageHeight);
+                        canvas.width = img.width;
+                        canvas.height = cutHeight / scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(
+                            img,
+                            0,
+                            positionY / scale,
+                            img.width,
+                            canvas.height,
+                            0,
+                            0,
+                            img.width,
+                            canvas.height
+                        );
+                        const partDataUrl = canvas.toDataURL('image/jpeg');
+                        if (positionY !== 0) {
+                            pdf.addPage();
+                        }
+                        pdf.addImage(
+                            partDataUrl,
+                            'JPEG',
+                            0,
+                            0,
+                            imgWidth,
+                            (canvas.height * 210) / img.width
+                        );
+                        remainingHeight -= cutHeight;
+                        positionY += canvas.height;
+                    }
+                } else {
+                    // Single page
+                    pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+                }
+                pdf.save('converted.pdf');
+            };
+        };
+        reader.readAsDataURL(file);
+    } else if (selected === 'pdf-to-jpg') {
+        // PDF to JPG conversion
+        const fileReader = new FileReader();
+        fileReader.onload = function(e) {
+            const typedarray = new Uint8Array(e.target.result);
+            // Load PDF.js
+            pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                const totalPages = pdf.numPages;
+                const images = []; // Store generated images here
+                // Process all pages
+                const processPage = function(pageNum) {
+                    return pdf.getPage(pageNum).then(function(page) {
+                        const viewport = page.getViewport({ scale: 1.0 });
+                        const scale = 2; // Increase scale for better quality
+                        const scaledViewport = page.getViewport({ scale: scale });
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.width = scaledViewport.width;
+                        canvas.height = scaledViewport.height;
+                        return page.render({ canvasContext: context, viewport: scaledViewport }).promise.then(() => {
+                            // Convert canvas to data URL
+                            const dataUrl = canvas.toDataURL('image/jpeg');
+                            images.push(dataUrl);
+                        });
+                    });
+                };
+                // Process pages sequentially
+                const allPromises = [];
+                for (let i = 1; i <= totalPages; i++) {
+                    allPromises.push(processPage(i));
+                }
+                Promise.all(allPromises).then(() => {
+                    // All pages rendered - offer download for each
+                    images.forEach((imgData, index) => {
+                        // Create download link dynamically
+                        const link = document.createElement('a');
+                        link.href = imgData;
+                        link.download = `page_${index + 1}.jpg`;
+                        link.click();
+                    });
+                });
+            }).catch(function(err){
+                console.error('Error loading PDF: ', err);
+                errorMessage.textContent = 'Failed to load PDF.';
+            });
+        };
+        // Read file as ArrayBuffer
+        fileReader.readAsArrayBuffer(file);
+    }
+});
