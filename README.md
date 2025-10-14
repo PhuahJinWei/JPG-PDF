@@ -2,4 +2,4 @@
 
 ## Access via:
 
-<a href="https://phuahjinwei.github.io/JPG-PDF/">here</a>
+<a href="https://phuahjinwei.github.io/JPG-PDF/src/mainPage.html">here</a>
