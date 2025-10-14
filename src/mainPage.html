@@ -1,0 +1,49 @@
+<!-- 
+	Created by Phuah Jin Wei
+	Version 1.03
+	2025/10/14
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JPG <--> PDF</title>
+
+
+<link rel="stylesheet" type="text/css" href=mainStyle.css>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist/build/pdf.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>JPG &lt;--&gt; PDF</h1>
+    <div class="image-section">
+        <img src="pic2pdf_image.png" alt="Conversion Image" />
+        <div class="radio-group">
+            <label class="radio-label">
+                <input type="radio" name="conversion" value="pdf-to-jpg" checked />
+                PDF to JPG
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="conversion" value="jpg-to-pdf" />
+                JPG to PDF
+            </label>
+        </div>
+    </div>
+    <div class="uploader">
+        <input type="file" id="file-uploader" />
+        <div id="error-message"></div>
+    </div>
+    <button id="convert-btn">Convert</button>
+</div>
+
+
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist/build/pdf.worker.js';</script>
+<script src="mainScript.js"></script>
+</body>
+</html>
