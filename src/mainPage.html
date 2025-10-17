@@ -1,7 +1,8 @@
 <!-- 
-	Created by Phuah Jin Wei
-	Version 1.03
-	2025/10/14
+    Created by Phuah Jin Wei
+    Version 2.13 (allow multi-conversion)
+    Created Date: 2025/10/15
+	Last Updated: 2025/10/17
 -->
 
 <!DOCTYPE html>
@@ -9,41 +10,52 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>JPG <--> PDF</title>
+<title>JPG ⇄ PDF</title>
 
 
+<!-- Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist/build/pdf.js"></script>
 <link rel="stylesheet" type="text/css" href=mainStyle.css>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist/build/pdf.js"></script>
 </head>
 <body>
+  <main class="container" role="main">
+    <h1>IMG ⇄ PDF</h1>
+    <p class="lead">Click or drop files below to upload</p>
 
-<div class="container">
-    <h1>JPG &lt;--&gt; PDF</h1>
-    <div class="image-section">
-        <img src="img/pic2pdf_image.png" alt="Conversion Image" />
-        <div class="radio-group">
-            <label class="radio-label">
-                <input type="radio" name="conversion" value="pdf-to-jpg" checked />
-                PDF to JPG
-            </label>
-            <label class="radio-label">
-                <input type="radio" name="conversion" value="jpg-to-pdf" />
-                JPG to PDF
-            </label>
-        </div>
+    <section class="image-section">
+      <img src="img/pic2pdf_image.png" alt="illustration" />
+      <div class="radio-group">
+        <fieldset role="radiogroup" aria-label="Conversion direction">
+          <legend>Conversion</legend>
+          <label class="radio-label">
+            <input type="radio" name="conversion" value="pdf-to-jpg" checked />
+            PDF to JPG
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="conversion" value="jpg-to-pdf" />
+            IMG to PDF
+          </label>
+        </fieldset>
+      </div>
+    </section>
+
+    <div class="uploader" id="drop-zone" role="button" tabindex="0" aria-label="Click or drop to upload files">
+      <div class="icon" aria-hidden="true"></div>
+      <div class="drop-hint" id="drop-hint">Click to browse or drop PDF/JPG/PNG files</div>
+      <div id="file-list" class="file-list" aria-live="polite"></div>
+      <input type="file" id="file-uploader" accept=".pdf,.jpg,.jpeg,.png" multiple />
+      <div id="error-message" role="status" aria-live="polite"></div>
     </div>
-    <div class="uploader">
-        <input type="file" id="file-uploader" />
-        <div id="error-message"></div>
+
+    <div class="actions">
+      <button id="convert-btn" type="button" disabled>Convert</button>
     </div>
-    <button id="convert-btn">Convert</button>
-</div>
+  </main>
 
 
-<script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist/build/pdf.worker.js';</script>
-<script src="mainScript.js"></script>
+  <script src="mainScript.js"></script>
 </body>
 </html>
